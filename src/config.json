@@ -1,0 +1,5 @@
+{
+  "shards": 2,
+  "token": "your token here",
+  "whitelist": ["id1", "id2"]
+}
