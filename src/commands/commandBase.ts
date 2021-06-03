@@ -10,16 +10,11 @@ export interface CommandMetadata {
   adminOnly?: boolean;
 }
 
-export class BaseCommand<
-  ParsedArgsFinished = Command.ParsedArgs
-> extends Command.Command<ParsedArgsFinished> {
-  metadata!: CommandMetadata;
+export class BaseCommand<ParsedArgsFinished = Command.ParsedArgs> extends Command.Command<ParsedArgsFinished> {
+  declare metadata: CommandMetadata;
   permissionsIgnoreClientOwner = true;
 
-  constructor(
-    commandClient: CommandClient,
-    options: Partial<Command.CommandOptions>
-  ) {
+  constructor(commandClient: CommandClient, options: Partial<Command.CommandOptions>) {
     super(
       commandClient,
       Object.assign(
@@ -27,8 +22,8 @@ export class BaseCommand<
           name: '',
           ratelimits: [{ duration: 5000, limit: 5, type: 'guild' }],
         },
-        options
-      )
+        options,
+      ),
     );
   }
 
@@ -42,14 +37,13 @@ export class BaseCommand<
   onCancelRun(context: Command.Context, args: unknown) {}
   onBeforeRun(context: Command.Context, args: ParsedArgs) {
     console.log(
-      `Running ${Object.entries(args)[0].join(' | ')} | C: ${
-        context.channelId
-      } | U: ${context.userId} | G: ${context.guildId}`
+      `Running ${Object.entries(args)[0].join(' | ')} | C: ${context.channelId} | U: ${context.userId} | G: ${
+        context.guildId
+      }`,
     );
 
     if (context.command?.metadata.adminOnly) {
-      if (!context.commandClient.config.whitelist.includes(context.userId))
-        return false;
+      if (!context.commandClient.config.whitelist.includes(context.userId)) return false;
       else return true;
     }
     //check for blacklisted/whitelisted commands
@@ -61,37 +55,33 @@ export class BaseCommand<
 
   onPermissionsFail(context: Command.Context, permissions: Array<bigint>) {
     try {
-      let perms = context.guild!.me?.permissionsIn(
-        (context.message as any)?.channel
-      )!;
+      let perms = context.guild!.me?.permissionsIn((context.message as any)?.channel)!;
 
       if ((perms & Permissions.SEND_MESSAGES) === Permissions.SEND_MESSAGES) {
         context.channel?.createMessage(
           `Missing permissions ${permissions
-            .map((perm) => {
+            .map(perm => {
               let e = '';
-              for (let [key, val] of Object.entries(Permissions))
-                if (perm === val) e = key;
+              for (let [key, val] of Object.entries(Permissions)) if (perm === val) e = key;
               return e;
             })
             .flat()
             .join(' , ')
-            .replace('_', ' ')}`
+            .replace('_', ' ')}`,
         );
       }
     } catch (e) {
       context.message.author
         .createMessage(
           `Missing permissions ${permissions
-            .map((perm) => {
+            .map(perm => {
               let e = '';
-              for (let [key, val] of Object.entries(Permissions))
-                if (perm === val) e = key;
+              for (let [key, val] of Object.entries(Permissions)) if (perm === val) e = key;
               return e;
             })
             .flat()
             .join(' , ')
-            .replace('_', ' ')}`
+            .replace('_', ' ')}`,
         )
         .catch(() => {
           /*voiding, nothing else can be done past this point*/
@@ -101,19 +91,11 @@ export class BaseCommand<
 
   async onSuccess(context: Command.Context, args: ParsedArgsFinished) {}
 
-  async onRunError(
-    context: Command.Context,
-    args: ParsedArgsFinished,
-    error: any
-  ) {
+  async onRunError(context: Command.Context, args: ParsedArgsFinished, error: any) {
     console.log({ context, args, error, type: 'onRunError' });
   }
 
-  async onTypeError(
-    context: Command.Context,
-    args: ParsedArgsFinished,
-    errors: Command.ParsedErrors
-  ) {
+  async onTypeError(context: Command.Context, args: ParsedArgsFinished, errors: Command.ParsedErrors) {
     console.log({ context, args, errors, type: 'onTypeError' });
   }
 }
