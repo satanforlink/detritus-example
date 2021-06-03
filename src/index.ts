@@ -1,3 +1,4 @@
+/// <reference path="./types/detritusOverrides.d.ts" />
 import { CommandClient } from 'detritus-client';
 import { GatewayIntents } from 'detritus-client-socket/lib/constants';
 import { Context } from 'detritus-client/lib/command';
@@ -6,7 +7,7 @@ import * as config from './config.json';
 
 const prefixes = ['.e', '.x'];
 const startup = Date.now();
-
+console.log('Starting bot...');
 const commandClient = new CommandClient(config.token, {
   useClusterClient: true,
   shardCount: config.shards,
