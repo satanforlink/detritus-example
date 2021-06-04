@@ -14,22 +14,26 @@ export default async (client: CommandClient, startup: number) => {
   client.config = config;
 
   //reading all events in /events folder
-  const commandClientEvents = fs.readdirSync('./src/events/commandClient').filter(file => file.endsWith('.ts'));
-  for (let file of commandClientEvents) {
-    //importing events
-    let ret: EventImport = await import(`../events/commandClient/${file}`);
-    // console.log(ret);
-    //binding the eventListeners
-    client.on(ret.default.name, payload => ret.default.execute(payload, client));
+  try {
+    const commandClientEvents = fs.readdirSync('./src/events/commandClient').filter(file => file.endsWith('.ts'));
+    for (let file of commandClientEvents) {
+      //importing events
+      let ret: EventImport = await import(`../events/commandClient/${file}`);
+      // console.log(ret);
+      //binding the eventListeners
+      client.on(ret.default.name, payload => ret.default.execute(payload, client));
 
-    console.log(`Loaded event ${ret.default.name} to commandClient`);
-  }
+      console.log(`Loaded event ${ret.default.name} to commandClient`);
+    }
 
-  const clusterClientEvents = fs.readdirSync('./src/events/clusterClient').filter(file => file.endsWith('.ts'));
-  for (let file of clusterClientEvents) {
-    let ret: EventImport = await import(`../events/clusterClient/${file}`);
-    // console.log(ret);
-    client.client.on(ret.default.name, payload => ret.default.execute(payload, client));
-    console.log(`Loaded event ${ret.default.name} to clusterClient`);
+    const clusterClientEvents = fs.readdirSync('./src/events/clusterClient').filter(file => file.endsWith('.ts'));
+    for (let file of clusterClientEvents) {
+      let ret: EventImport = await import(`../events/clusterClient/${file}`);
+      // console.log(ret);
+      client.client.on(ret.default.name, payload => ret.default.execute(payload, client));
+      console.log(`Loaded event ${ret.default.name} to clusterClient`);
+    }
+  } catch (e) {
+    console.log(e);
   }
 };
