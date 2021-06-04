@@ -2,7 +2,7 @@
 import { CommandClient } from 'detritus-client';
 import { GatewayIntents } from 'detritus-client-socket/lib/constants';
 import { Context } from 'detritus-client/lib/command';
-import start from '../src/modules/start';
+import start from './modules/start';
 import * as config from './config.json';
 
 const prefixes = ['.e', '.x'];
