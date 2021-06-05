@@ -27,7 +27,7 @@ export default class MainCommand extends BaseCommand {
     const message = payload.message;
 
     // This is your array of strings, usually known as args
-    let args: string[] = __args[this.name].split(/ +/g);
+    const args: string[] = __args[this.name].split(/ +/g);
 
     // Get the time now
     const before = performance.now();

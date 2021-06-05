@@ -21,9 +21,9 @@ export default async (client: CommandClient, startup: number) => {
       .readdirSync(path.resolve(__dirname, '../events/commandClient'), { withFileTypes: true })
       .filter(file => ['js', 'ts'].some(e => file.name.endsWith(e)) && !file.name.endsWith('.d.ts'));
 
-    for (let file of commandClientEvents) {
+    for (const file of commandClientEvents) {
       // Importing events
-      let ret: EventImport = await import(path.resolve(__dirname, `../events/commandClient/${file.name}`));
+      const ret: EventImport = await import(path.resolve(__dirname, `../events/commandClient/${file.name}`));
 
       // Binding the eventListeners
       client.on(ret.default.name, payload => ret.default.execute(payload, client));
@@ -35,9 +35,9 @@ export default async (client: CommandClient, startup: number) => {
       .readdirSync(path.resolve(__dirname, '../events/clusterClient'), { withFileTypes: true })
       .filter(file => ['js', 'ts'].some(e => file.name.endsWith(e)) && !file.name.endsWith('.d.ts'));
 
-    for (let file of clusterClientEvents) {
+    for (const file of clusterClientEvents) {
       // Importing events
-      let ret: EventImport = await import(path.resolve(__dirname, `../events/clusterClient/${file.name}`));
+      const ret: EventImport = await import(path.resolve(__dirname, `../events/clusterClient/${file.name}`));
 
       // Binding the eventListeners
       client.client.on(ret.default.name, payload => ret.default.execute(payload, client));

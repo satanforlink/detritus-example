@@ -25,40 +25,38 @@ export default class MainCommand extends BaseCommand {
 
   async run(payload: Context, __args: ParsedArgs): Promise<any> {
     const message = payload.message;
-    let args: string[] = __args[this.name].split(/ +/g);
+    const args: string[] = __args[this.name].split(/ +/g);
 
     switch (args[0]) {
-      case 'events': {
-        // handle event reloading here
-        break;
-      }
-      case 'commands':
-      default: {
-        // Hoist the error variable
-        let err = false;
-        
-        try {
-          // Clear all of the commands
-          this.commandClient.clear();
+    case 'events': {
+      // handle event reloading here
+      break;
+    }
+    case 'commands':
+    default: {
+      // Hoist the error variable
+      let err = false;
 
-          // Read all of the commands
-          await this.commandClient
-          .addMultipleIn('commands', { subdirectories: true })
-          .catch((...e) => {
-            e.forEach(console.error);
-            err = true;
-          });
-          
-          if (!err) console.log('Reloaded Commands');
-        } catch (e) {
+      try {
+        // Clear all of the commands
+        message.client.commandClient!.clear();
+
+        // Read all of the commands
+        await message.client.commandClient!.addMultipleIn('commands', { subdirectories: true }).catch((...e) => {
+          e.forEach(console.error);
           err = true;
-          console.error(e);
-        }
-        
-        // React to the message
-        if (!err) return await message.react('✅');
-        else return await message.react('❎');
+        });
+
+        if (!err) console.log('Reloaded Commands');
+      } catch (e) {
+        err = true;
+        console.error(e);
       }
+
+      // React to the message
+      if (!err) return message.react('✅');
+      else return message.react('❎');
+    }
     }
   }
 }

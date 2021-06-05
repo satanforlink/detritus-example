@@ -31,11 +31,11 @@ const commandClient = new CommandClient(config.token, {
       GatewayIntents.DIRECT_MESSAGES,
       GatewayIntents.DIRECT_MESSAGE_REACTIONS,
       GatewayIntents.GUILD_VOICE_STATES,
-    ] /*'ALL'*/,
+    ] /* 'ALL'*/,
   },
   prefixes,
   onPrefixCheck: (payload: Context) => {
-    let _prefix = prefixes;
+    const prefix = prefixes;
 
     // The example below show how you should do it. Preferably have it from a database, but make sure to
     // cache it so you dont constantly fetch it from database
@@ -51,7 +51,7 @@ const commandClient = new CommandClient(config.token, {
     //        .get(payload.message.guildId)!
     //        .custom_prefix!.toLowerCase(),
     //    ];
-    return _prefix;
+    return prefix;
   },
 });
 
