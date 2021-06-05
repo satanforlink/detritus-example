@@ -2,9 +2,14 @@ import { Command, CommandClient } from 'detritus-client';
 import { Permissions } from 'detritus-client/lib/constants';
 import { ParsedArgs } from 'detritus-client/lib/command';
 
+/**
+ * The command metadata
+ *
+ * Used for the help menu
+ */
 export interface CommandMetadata {
   description?: string;
-  examples?: Array<string>;
+  examples?: string[];
   nsfw?: boolean;
   usage?: string;
   adminOnly?: boolean;
@@ -17,13 +22,12 @@ export class BaseCommand<ParsedArgsFinished = Command.ParsedArgs> extends Comman
   constructor(commandClient: CommandClient, options: Partial<Command.CommandOptions>) {
     super(
       commandClient,
-      Object.assign(
-        {
-          name: '',
-          ratelimits: [{ duration: 5000, limit: 5, type: 'guild' }],
-        },
-        options,
-      ),
+      // Assign the default options
+      {
+        name: '',
+        ratelimits: [{ duration: 5000, limit: 5, type: 'guild' }],
+        ...options,
+      },
     );
   }
 
@@ -35,6 +39,7 @@ export class BaseCommand<ParsedArgsFinished = Command.ParsedArgs> extends Comman
   }
 
   onCancelRun(context: Command.Context, args: unknown) {}
+
   onBeforeRun(context: Command.Context, args: ParsedArgs) {
     console.log(
       `Running ${Object.entries(args)[0].join(' | ')} | C: ${context.channelId} | U: ${context.userId} | G: ${
@@ -46,23 +51,26 @@ export class BaseCommand<ParsedArgsFinished = Command.ParsedArgs> extends Comman
       if (!context.commandClient.config.whitelist.includes(context.userId)) return false;
       else return true;
     }
-    //check for blacklisted/whitelisted commands
+
+    // Check for blacklisted/whitelisted commands
     return true;
   }
-  onPermissionsFailClient(context: Command.Context, failed: Array<bigint>) {
+
+  onPermissionsFailClient(context: Command.Context, failed: bigint[]) {
     console.log({ context, failed, type: 'onPermissionsFailClient' });
   }
 
-  onPermissionsFail(context: Command.Context, permissions: Array<bigint>) {
+  onPermissionsFail(context: Command.Context, permissions: bigint[]) {
     try {
-      let perms = context.guild!.me?.permissionsIn((context.message as any)?.channel)!;
+      const perms = context.guild!.me?.permissionsIn((context.message as any)?.channel)!;
 
+      // eslint-disable-next-line no-bitwise
       if ((perms & Permissions.SEND_MESSAGES) === Permissions.SEND_MESSAGES) {
         context.channel?.createMessage(
           `Missing permissions ${permissions
             .map(perm => {
               let e = '';
-              for (let [key, val] of Object.entries(Permissions)) if (perm === val) e = key;
+              for (const [key, val] of Object.entries(Permissions)) if (perm === val) e = key;
               return e;
             })
             .flat()
@@ -70,13 +78,13 @@ export class BaseCommand<ParsedArgsFinished = Command.ParsedArgs> extends Comman
             .replace('_', ' ')}`,
         );
       }
-    } catch (e) {
+    } catch (err) {
       context.message.author
         .createMessage(
           `Missing permissions ${permissions
             .map(perm => {
               let e = '';
-              for (let [key, val] of Object.entries(Permissions)) if (perm === val) e = key;
+              for (const [key, val] of Object.entries(Permissions)) if (perm === val) e = key;
               return e;
             })
             .flat()
@@ -84,7 +92,7 @@ export class BaseCommand<ParsedArgsFinished = Command.ParsedArgs> extends Comman
             .replace('_', ' ')}`,
         )
         .catch(() => {
-          /*voiding, nothing else can be done past this point*/
+          /* Voiding, nothing else can be done past this point */
         });
     }
   }

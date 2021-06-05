@@ -2,12 +2,16 @@
 import { CommandClient } from 'detritus-client';
 import { GatewayIntents } from 'detritus-client-socket/lib/constants';
 import { Context } from 'detritus-client/lib/command';
-import start from './modules/start';
+
 import * as config from './config.json';
+
+import start from './modules/start';
 
 const prefixes = ['.e', '.x'];
 const startup = Date.now();
+
 console.log('Starting bot...');
+
 const commandClient = new CommandClient(config.token, {
   useClusterClient: true,
   shardCount: config.shards,
@@ -27,13 +31,13 @@ const commandClient = new CommandClient(config.token, {
       GatewayIntents.DIRECT_MESSAGES,
       GatewayIntents.DIRECT_MESSAGE_REACTIONS,
       GatewayIntents.GUILD_VOICE_STATES,
-    ] /*'ALL'*/,
+    ] /* 'ALL'*/,
   },
   prefixes,
   onPrefixCheck: (payload: Context) => {
-    let _prefix = prefixes;
+    const prefix = prefixes;
 
-    // the example below show how you should do it. Preferably have it from a database, but ensure to
+    // The example below show how you should do it. Preferably have it from a database, but make sure to
     // cache it so you dont constantly fetch it from database
 
     //  if (!payload.message.guildId) return prefixes;
@@ -47,8 +51,10 @@ const commandClient = new CommandClient(config.token, {
     //        .get(payload.message.guildId)!
     //        .custom_prefix!.toLowerCase(),
     //    ];
-    return _prefix;
+    return prefix;
   },
 });
+
 start(commandClient, startup);
+
 commandClient.run();

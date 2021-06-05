@@ -1,36 +1,47 @@
-import { ClusterClient, CommandClient, GatewayClientEvents } from 'detritus-client';
+import { CommandClient } from 'detritus-client';
 import * as config from '../config.json';
+
 import fs from 'fs';
+import path from 'path';
 
 interface EventImport {
   default: { name: 'string'; execute(payload: any, attachment: CommandClient): void };
 }
 
-// this is just cleaning stuff out of index.
+// This is just cleaning stuff out of index.
 export default async (client: CommandClient, startup: number) => {
-  // attach anything you want here to the client. for example your database driver
-  // make sure you also add the type declaration in types.ts
+  // Attach anything you want here to the client. For example, your database driver
+  // Make sure you also add the type declaration in types.ts
   // client.postgres = new Pool(client.config.databaseUser);
   client.config = config;
 
-  //reading all events in /events folder
+  // Reading all events in /events folder
   try {
-    const commandClientEvents = fs.readdirSync('./src/events/commandClient').filter(file => file.endsWith('.ts'));
-    for (let file of commandClientEvents) {
-      //importing events
-      let ret: EventImport = await import(`../events/commandClient/${file}`);
-      // console.log(ret);
-      //binding the eventListeners
+    const commandClientEvents = fs
+      .readdirSync(path.resolve(__dirname, '../events/commandClient'), { withFileTypes: true })
+      .filter(file => ['js', 'ts'].some(e => file.name.endsWith(e)) && !file.name.endsWith('.d.ts'));
+
+    for (const file of commandClientEvents) {
+      // Importing events
+      const ret: EventImport = await import(path.resolve(__dirname, `../events/commandClient/${file.name}`));
+
+      // Binding the eventListeners
       client.on(ret.default.name, payload => ret.default.execute(payload, client));
 
       console.log(`Loaded event ${ret.default.name} to commandClient`);
     }
 
-    const clusterClientEvents = fs.readdirSync('./src/events/clusterClient').filter(file => file.endsWith('.ts'));
-    for (let file of clusterClientEvents) {
-      let ret: EventImport = await import(`../events/clusterClient/${file}`);
-      // console.log(ret);
+    const clusterClientEvents = fs
+      .readdirSync(path.resolve(__dirname, '../events/clusterClient'), { withFileTypes: true })
+      .filter(file => ['js', 'ts'].some(e => file.name.endsWith(e)) && !file.name.endsWith('.d.ts'));
+
+    for (const file of clusterClientEvents) {
+      // Importing events
+      const ret: EventImport = await import(path.resolve(__dirname, `../events/clusterClient/${file.name}`));
+
+      // Binding the eventListeners
       client.client.on(ret.default.name, payload => ret.default.execute(payload, client));
+
       console.log(`Loaded event ${ret.default.name} to clusterClient`);
     }
   } catch (e) {
