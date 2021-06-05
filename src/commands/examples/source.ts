@@ -10,7 +10,7 @@ export default class MainCommand extends BaseCommand {
   constructor(client: CommandClient) {
     super(client, {
       name: COMMAND_NAME,
-      permissionsClient: [Permissions.SEND_MESSAGES],
+      permissionsClient: [Permissions.SEND_MESSAGES, Permissions.ADD_REACTIONS],
       permissions: [],
       metadata: {
         description: 'Source Code Command',
@@ -21,7 +21,14 @@ export default class MainCommand extends BaseCommand {
     });
   }
 
-  async run({ message }: Context, __args: ParsedArgs): Promise<any> {
-    message.reply('Repo: <https://github.com/erwin1234777/detritus-example>\nLibrary: <https://detritusjs.com/>');
+  async run(payload: Context, __args: ParsedArgs): Promise<any> {
+    await payload.message
+      .reply('Repo: <https://github.com/erwin1234777/detritus-example>\nLibrary: <https://detritusjs.com/>')
+      .catch(async err => {
+        await payload.message.react('❎').catch(() => {
+          /* Voided */
+        });
+        console.error(err);
+      });
   }
 }
