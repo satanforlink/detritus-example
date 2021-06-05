@@ -25,12 +25,9 @@ export default class MainCommand extends BaseCommand {
   async run(payload: Context, __args: ParsedArgs): Promise<any> {
     const message = payload.message;
     const cc = message?.client.commandClient;
-
-    if (!message || !cc || !message.channel || !message.guild) return;
+    if (!cc || !message.channel || !payload.client.commandClient) return;
     let args: string[] = __args[this.name].split(/ +/g);
-    if (!payload.client || !payload.client.commandClient) return;
-    if (payload.message.author.id !== payload.commandClient.config?.ownerID)
-      return;
+
     switch (args[0]) {
       case 'commands': {
         let err = false;
