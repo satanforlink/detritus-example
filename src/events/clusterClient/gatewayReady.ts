@@ -12,7 +12,7 @@ export default {
       let err = false;
 
       await client.addMultipleIn('commands', { subdirectories: true }).catch((...e) => {
-        console.log(e)
+        console.log(e);
         e.forEach(console.error);
         err = true;
       });
