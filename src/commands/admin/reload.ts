@@ -41,7 +41,7 @@ export default class MainCommand extends BaseCommand {
           // Clear all of the commands
           this.commandClient.clear();
 
-          // Readd all of the commands
+          // Read all of the commands
           await this.commandClient
           .addMultipleIn('commands', { subdirectories: true })
           .catch((...e) => {
