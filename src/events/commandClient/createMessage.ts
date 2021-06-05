@@ -2,11 +2,8 @@ import { CommandClient, GatewayClientEvents } from 'detritus-client';
 
 export default {
   name: 'messageCreate',
-  async execute(
-    payload: GatewayClientEvents.MessageCreate,
-    cmdClient: CommandClient
-  ) {
+  async execute(payload: GatewayClientEvents.MessageCreate, cmdClient: CommandClient) {
     const message = payload.message;
-    // do whatever you want with message here
+    // Do whatever you want with message here
   },
 };

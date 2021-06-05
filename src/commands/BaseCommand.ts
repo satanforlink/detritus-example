@@ -2,6 +2,11 @@ import { Command, CommandClient } from 'detritus-client';
 import { Permissions } from 'detritus-client/lib/constants';
 import { ParsedArgs } from 'detritus-client/lib/command';
 
+/**
+ * The command metadata
+ *
+ * Used for the help menu
+ */
 export interface CommandMetadata {
   description?: string;
   examples?: Array<string>;
@@ -17,6 +22,7 @@ export class BaseCommand<ParsedArgsFinished = Command.ParsedArgs> extends Comman
   constructor(commandClient: CommandClient, options: Partial<Command.CommandOptions>) {
     super(
       commandClient,
+      // Assign the default options
       Object.assign(
         {
           name: '',
@@ -35,6 +41,7 @@ export class BaseCommand<ParsedArgsFinished = Command.ParsedArgs> extends Comman
   }
 
   onCancelRun(context: Command.Context, args: unknown) {}
+
   onBeforeRun(context: Command.Context, args: ParsedArgs) {
     console.log(
       `Running ${Object.entries(args)[0].join(' | ')} | C: ${context.channelId} | U: ${context.userId} | G: ${
@@ -46,9 +53,11 @@ export class BaseCommand<ParsedArgsFinished = Command.ParsedArgs> extends Comman
       if (!context.commandClient.config.whitelist.includes(context.userId)) return false;
       else return true;
     }
-    //check for blacklisted/whitelisted commands
+
+    // Check for blacklisted/whitelisted commands
     return true;
   }
+
   onPermissionsFailClient(context: Command.Context, failed: Array<bigint>) {
     console.log({ context, failed, type: 'onPermissionsFailClient' });
   }
@@ -84,7 +93,7 @@ export class BaseCommand<ParsedArgsFinished = Command.ParsedArgs> extends Comman
             .replace('_', ' ')}`,
         )
         .catch(() => {
-          /*voiding, nothing else can be done past this point*/
+          /* Voiding, nothing else can be done past this point */
         });
     }
   }
